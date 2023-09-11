@@ -2,13 +2,13 @@
 #include <string.h>
 
 // CRC-CCITT polynomial: x^16 + x^12 + x^5 + 1 (0x1021 in hexadecimal or 1000000100000101 in binary)
-#define CRC_POLY_BINARY 1000000100000101
+#define CRC_POLY_BINARY 0x1021
 
 // Function to calculate CRC-CCITT checksum
 unsigned short calculateCRC(const char *data, int length) {
     unsigned short crc = 0xFFFF; // Initial value
     for (int i = 0; i < length; i++) {
-        crc ^= (unsigned short)data[i] << 8;
+        crc ^= (data[i] << 8);
         for (int j = 0; j < 8; j++) {
             if (crc & 0x8000)
                 crc = (crc << 1) ^ CRC_POLY_BINARY;
@@ -27,31 +27,21 @@ int main() {
     int dataLength = strlen(data);
     unsigned short checksum = calculateCRC(data, dataLength);
 
-    printf("Calculated CRC in binary: ");
-    for (int i = 15; i >= 0; i--) {
-        printf("%d", (checksum >> i) & 0x01);
-    }
-    printf("\n");
+    printf("Calculated CRC in hexadecimal: 0x%04X\n", checksum);
 
-    // Simulating error by changing a bit
-    // data[2] ^= 0x01; // Uncomment this line to introduce an error
+    // Simulating error by changing a bit (uncomment the line below to introduce an error)
+    // data[2] ^= 0x01;
 
     // Verify the received data
     unsigned short receivedChecksum;
-    printf("Enter received CRC in binary: ");
-    char r`eceivedChecksumBinary[17];
-    scanf("%16s", receivedChecksumBinary);
-
-    receivedChecksum = 0;
-    for (int i = 0; i < 16; i++) {
-        receivedChecksum <<= 1;
-        receivedChecksum |= receivedChecksumBinary[i] - '0';
-    }
+    printf("Enter received CRC in hexadecimal: ");
+    scanf("%4hx", &receivedChecksum);
 
     if (receivedChecksum == checksum) {
         printf("Data is error-free.\n");
     } else {
         printf("Data contains errors.\n");
     }
-return 0;
+
+    return 0;
 }
